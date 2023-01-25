@@ -162,46 +162,17 @@
     <td>{{$value.heroName}}</td>
     <td>{{$value.heroSkill.skillName}}</td>
     <td><img src="{{$value.heroIcon}}" alt="" /></td>
-    <td>
-      <button onclick="editHero('{{$value.heroId}}')" class="btn btn-success">编辑🍞</button>
-
-      <button onclick="deleteHero({heroId :'{{$value.heroId}}',heroName:'{{$value.heroName}}'})" class="btn btn-danger">删除👍</button>
+    <td data-id="{{$value.heroId}}">
+      <button class="btn btn-success btn-edit">编辑🍞</button>
+      <button class="btn btn-danger btn-delete">删除👍</button>
     </td>
   </tr>
   {{ /each }}
 </script>
 <script src="./common.js"></script>
 <script>
-  // 点击跳转到编辑页面
-  const editHero = (heroId) => {
-    location.href = 'edit.html?heroId=' + heroId
-  }
-  // 点击删除特定英雄
-  const deleteHero = (obj) => {
-    if (confirm(`真的要删除 "${obj.heroName}" 英雄吗?`)) {
-      $.post({
-        url: 'deleteHero',
-        data: {
-          heroId: obj.heroId
-        },
-        success(res) {
-          if(res.msg=='未登录'){
-            location = 'login.html'
-          } else {
-              if (res.status == 'success') {
-                alert(`删除${obj.heroName}英雄成功!!`)
-                location = 'index.html';
-              } else {
-                alert(`删除${obj.heroName}英雄失败!!`)
-              }            
-            }
-        }
-      })
-    }
-  }
 
   $(function () {
-
 
     // 正则匹配url参数
     const getUrlParams = name => {
@@ -264,7 +235,7 @@
       }
     })
 
-    // 点击按钮 搜索英雄
+    // 点击按钮/回车 搜索英雄
     $('.btn-search').click(() => {
       queryName = $('[name=search]').val().trim();
       if(!queryName)return;
@@ -272,6 +243,38 @@
       getHeros(pageIndex, pageNum,queryName);
       return false;
     })
+
+  // 点击跳转到编辑页面
+  $('tbody').on('click','.btn-edit',function(){
+    const heroId = $(this).parent().data('id');
+    location.href = "edit.html?heroId="+heroId;
+  })
+  // 点击删除英雄
+  $('tbody').on('click','.btn-delete',function(){
+    const heroId = $(this).parent().data('id');
+    const heroName = $(this).parents('tr').children('td:first').text();
+    if (confirm(`真的要删除 "${heroName}" 英雄吗?`)) {
+      $.post({
+        url: 'deleteHero',
+        data: {
+          heroId: heroId
+        },
+        success(res) {
+          if(res.msg=='未登录'){
+            location = 'login.html'
+          } else {
+              if (res.status == 'success') {
+                alert(`删除${heroName}英雄成功!!`)
+                location = 'index.html';
+              } else {
+                alert(`删除${heroName}英雄失败!!`)
+              }            
+            }
+        }
+      })
+    }
+  })
+ 
 
   })
 </script>

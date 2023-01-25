@@ -47,7 +47,10 @@ router.get("/captcha", (req, res) => {
 
 // (1) 账号 登出
 router.get("/logout", (req, res) => {
-  req.session.cookie.maxAge = 0;
+  // req.session.cookie.maxAge = 0;
+  req.session.destroy(function (err) {
+    console.log(err);
+})
   res.send({
     status: "success",
     msg: "退出成功",
@@ -66,7 +69,6 @@ router.post("/login", (req, res) => {
     return;
   }
   mongodbHelper.find("userList", {}, (data) => {
-    // console.log(data);
     const accountPass = data.some(
       (val) => userName == val.userName && userPass == val.userPass
     );
@@ -187,19 +189,17 @@ router.get("/getHero", (req, res) => {
     return;
   }
   const heroId = req.query.heroId;
-  console.log(heroId);
   mongodbHelper.find(
     "heroList",
     { _id: mongodbHelper.ObjectId(heroId) },
     (data) => {
-      console.log(data);
       res.send(data[0]);
     }
   );
 });
 
 // (4) 接收数据 添加英雄
-router.post("/addHero", upload.single("avatar"), function (req, res, next) {
+router.post("/addHero", upload.single("heroIcon"), function (req, res, next) {
   // 是否已登录
   if (!req.session.userinfo) {
     res.send({
@@ -208,7 +208,7 @@ router.post("/addHero", upload.single("avatar"), function (req, res, next) {
     });
     return;
   }
-  // req.file 是 `avatar` 文件的信息
+  // req.file 是 `heroIcon` 文件的信息
   // req.body 将具有文本域数据，如果存在的话
   fs.rename(
     req.file.path,
@@ -221,11 +221,10 @@ router.post("/addHero", upload.single("avatar"), function (req, res, next) {
           "heroList",
           {
             heroName: req.body.heroName,
-            skillArr: [{ skillName: req.body.heroSkill }],
+            skillArr: [{ skillName: req.body.skillName }],
             heroIcon: `uploads/${req.file.originalname}`,
           },
           (data) => {
-            console.log(data);
             if (data.acknowledged == true) {
               res.send({
                 msg: "英雄添加成功",
@@ -246,7 +245,7 @@ router.post("/addHero", upload.single("avatar"), function (req, res, next) {
 });
 
 // (4) 编辑某个英雄
-router.post("/editHero", upload.single("avatar"), (req, res, next) => {
+router.post("/editHero", upload.single("heroIcon"), (req, res, next) => {
   // 是否已登录
   if (!req.session.userinfo) {
     res.send({
@@ -271,7 +270,6 @@ router.post("/editHero", upload.single("avatar"), (req, res, next) => {
             heroIcon: `uploads/${req.file.originalname}`,
           },
           (data) => {
-            console.log(data);
             if (data.acknowledged == true) {
               res.send({
                 msg: "英雄编辑成功",
@@ -306,7 +304,6 @@ router.post("/deleteHero", (req, res) => {
     "heroList",
     { _id: mongodbHelper.ObjectId(heroId) },
     (data) => {
-      console.log(data);
       if (data.acknowledged == true) {
         res.send({
           msg: "英雄删除成功",

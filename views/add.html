@@ -118,27 +118,27 @@
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="skill" class="col-sm-2 control-label">技能</label>
+                  <label for="skillName" class="col-sm-2 control-label">技能</label>
                   <div class="col-sm-10">
                     <input
                       required
                       type="text"
                       class="form-control"
-                      id="skill"
-                      name="skill"
+                      id="skillName"
+                      name="skillName"
                       placeholder="请输入技能"
                     />
                   </div>
                 </div>
                 <div class="form-group">
-                  <label for="icon" class="col-sm-2 control-label">头像</label>
+                  <label for="heroIcon" class="col-sm-2 control-label">头像</label>
                   <div class="col-sm-10">
                     <input
                       type="file"
                       required
                       class="form-control"
-                      id="icon"
-                      name="icon"
+                      id="heroIcon"
+                      name="heroIcon"
                     />
                   </div>
                 </div>
@@ -166,17 +166,18 @@
 
     // 点击添加新英雄
     $('.btn-add').click(()=>{
+      // const heroInfo = new FormData($('form')[0]); //这样不严谨
       const heroName = $('#heroName').val().trim();
-      const skill = $('#skill').val().trim();
-      const iconFile = $('#icon').prop('files')
-      if(!heroName || !skill || !iconFile[0]){
-        // alert('资料不全!!!请检查!!');
+      const skillName = $('#skillName').val().trim();
+      const heroIcon = $('#heroIcon').prop('files')
+      if(!heroName || !skillName || !heroIcon[0]){
+        // 资料不全!!;
         return;
       }
       let formData = new FormData()
       formData.append('heroName',heroName);
-      formData.append('heroSkill',skill);
-      formData.append('avatar',iconFile[0]);
+      formData.append('skillName',skillName);
+      formData.append('heroIcon',heroIcon[0]);
       $.post({
         url:"addHero",
         data:formData,
