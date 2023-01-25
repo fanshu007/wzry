@@ -1,0 +1,28 @@
+{
+  "name": "wzry",
+  "version": "1.0.0",
+  "description": "&lt;王者荣耀>===简单node+express+mongoDB+jquery+bootstrap",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fanshu007/wzryManage.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/fanshu007/wzryManage/issues"
+  },
+  "homepage": "https://github.com/fanshu007/wzryManage#readme",
+  "dependencies": {
+    "body-parser": "^1.20.1",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "mongodb": "^4.13.0",
+    "multer": "^1.4.5-lts.1",
+    "svg-captcha": "^1.4.0"
+  }
+}

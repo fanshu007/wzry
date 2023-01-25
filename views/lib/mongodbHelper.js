@@ -8,66 +8,66 @@ const client = new MongoClient(url);
 
 module.exports = {
     ObjectId,
-    find(dbName,cName,sql,callback){
-      async function main(dbName,cName,sql,callback) {
+    find(cName,sql,callback){
+      async function main(cName,sql,callback) {
       await client.connect();
       console.log('db已连接');
-      const db = client.db(dbName);
+      const db = client.db('GloryOfKings');
       const collection = db.collection(cName);
       // 要执行的sql语句
       const findResult = await collection.find(sql).toArray();
       callback(findResult)
       return 'done.';
     }
-        main(dbName,cName,sql,callback)
+        main(cName,sql,callback)
         .then(console.log)
         .catch(console.error)
         .finally(() => client.close());    
     },
-    insert(dbName,cName,sql,callback){
-      async function main(dbName,cName,sql,callback) {
+    insert(cName,sql,callback){
+      async function main(cName,sql,callback) {
       await client.connect();
       console.log('db已连接');
-      const db = client.db(dbName);
+      const db = client.db('GloryOfKings');
       const collection = db.collection(cName);
       // 要执行的sql语句
       const insertResult = await collection.insertOne(sql);
       callback(insertResult)
       return 'done.';
     }
-        main(dbName,cName,sql,callback)
+        main(cName,sql,callback)
         .then(console.log)
         .catch(console.error)
         .finally(() => client.close());    
     },
-    update(dbName,cName,compare,sql,callback){
-      async function main(dbName,cName,sql,callback) {
+    update(cName,compare,sql,callback){
+      async function main(cName,sql,callback) {
       await client.connect();
       console.log('db已连接');
-      const db = client.db(dbName);
+      const db = client.db('GloryOfKings');
       const collection = db.collection(cName);
       // 要执行的sql语句
       const updateResult = await collection.updateOne(compare,{ $set: sql });
       callback(updateResult)
       return 'done.';
     }
-        main(dbName,cName,sql,callback)
+        main(cName,sql,callback)
         .then(console.log)
         .catch(console.error)
         .finally(() => client.close());    
     },
-    delete(dbName,cName,sql,callback){
-      async function main(dbName,cName,sql,callback) {
+    delete(cName,sql,callback){
+      async function main(cName,sql,callback) {
       await client.connect();
       console.log('db已连接');
-      const db = client.db(dbName);
+      const db = client.db('GloryOfKings');
       const collection = db.collection(cName);
       // 要执行的sql语句
       const deleteResult = await collection.deleteOne(sql)
       callback(deleteResult)
       return 'done.';
     } 
-        main(dbName,cName,sql,callback)
+        main(cName,sql,callback)
         .then(console.log)
         .catch(console.error)
         .finally(() => client.close());    
