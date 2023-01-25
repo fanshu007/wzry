@@ -29,6 +29,22 @@
         text-decoration: none;
         color: yellowgreen;
       }
+      .panel-heading {
+        position: relative;
+      }
+      .alert{
+      position: absolute;
+      top: -52px;
+      left: 0;
+      height: 52px;
+      width: 100%;
+    }
+    .alert p {
+      display: none;
+      font-weight: bold;
+      width: 100%;
+      text-align: center;
+    }
     </style>
   </head>
 
@@ -76,6 +92,9 @@
         <div class="col-md-12">
           <div class="panel panel-default">
             <div class="panel-heading">
+              <div class="alert">
+                <p class="">6666</p>
+              </div>
               <ol class="breadcrumb">
                 <li><a href="./index.html">首页</a></li>
                 <li class="active">英雄新增</li>
@@ -169,13 +188,15 @@
             location = 'login.html'
           } else {
             if(res.status=='success'){
-              alert('英雄添加成功!');
-              location = 'index.html'
+              $('.alert p').addClass('bg-success').text(res.msg).fadeIn(1000).fadeOut();
+              $('.form-horizontal input').text('')
+              setTimeout(() => {
+                location = 'index.html';
+              }, 1500);
             } else {
-              alert('英雄添加失败!');
-            }            
+              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(1000).fadeOut(2000);
+            }  
           }
-
         }
       })
       return false;
