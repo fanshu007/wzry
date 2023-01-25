@@ -99,20 +99,20 @@
                       <input type="text" value="" class="form-control" name="search" placeholder="请输入查询内容" />
                     </div>
                   </div>
-                  <button type="submit" class="btn btn-success btn-search">查找</button>
+                  <button type="submit" class="btn btn-success btn-search" >查找</button>
                   <a href="add.html" class="btn btn-warning">新增</a>
                 </form>
               </div>
               <div class="col-md-3">
                 <ul class="pagination  pull-right" style="margin:0">
                   <li>
-                    <a href="#" aria-label="Previous">
+                    <a href="javascript:void(0)" aria-label="Previous">
                       <span aria-hidden="true">«</span>
                     </a>
                   </li>
-                  <li class="page-num"><a href="#">1/1</a></li>
+                  <li class="page-num"><a href="javascript:void(0)">1/1</a></li>
                   <li>
-                    <a href="#" aria-label="Next">
+                    <a href="javascript:void(0)" aria-label="Next">
                       <span aria-hidden="true">»</span>
                     </a>
                   </li>
@@ -195,7 +195,6 @@
                 alert(`删除${obj.heroName}英雄失败!!`)
               }            
             }
-
         }
       })
     }
@@ -215,36 +214,42 @@
     let pageIndex = getUrlParams('pageIndex') || 1;
     let pageNum = getUrlParams('pageNum') || 10;
     let totalPages = 1;
-
+    let queryName = $('[name=search]').val().trim();
     // 获取相应页的英雄
-    const getHeros = (pageIndex, pageNum) => {
-
+    const getHeros = (pageIndex, pageNum,queryName) => {
       $.get({
         url: "/getHeroList",
         data: {
           pageIndex,
-          pageNum
+          pageNum,
+          queryName
         },
         success(res) {
-          // console.log(res.totalNum);
           if(res.msg==='未登录'){
             location = 'login.html'
           } else {
-            const html = template('tpl-tr', {list:res.selectedHero});
-            $('#my-table tbody').html(html);
-            totalPages = Math.ceil(res.totalNum / pageNum);
-            $('.page-num').children('a').text(`${pageIndex}/${totalPages}`)
+            if(res.totalNum){
+              const html = template('tpl-tr', {list:res.selectedHero});
+              $('#my-table tbody').html(html);
+              totalPages = Math.ceil(res.totalNum / pageNum);
+              $('.page-num').children('a').text(`${pageIndex}/${totalPages}`)              
+            } else {
+              totalPages = 1;
+              pageIndex =1;
+                $('#my-table tbody').html('<tr><td>查无此英雄!!!</td></tr>');
+                $('.page-num').children('a').text(`${pageIndex}/${totalPages}`)
+            }
           }
         }
       })
     }
-    getHeros(pageIndex, pageNum);
+    getHeros(pageIndex, pageNum,queryName);
 
     // 点击上一页的英雄
     $('.page-num').prev().click(() => {
       if (pageIndex >= 2) {
         pageIndex--;
-        getHeros(pageIndex, pageNum);
+        getHeros(pageIndex, pageNum ,queryName);
       } else {
         alert('已经是第一页了')
       }
@@ -253,7 +258,7 @@
     $('.page-num').next().click(() => {
       if (pageIndex < totalPages) {
         pageIndex++;
-        getHeros(pageIndex, pageNum);
+        getHeros(pageIndex, pageNum,queryName);
       } else {
         alert('已经是最后一页了')
       }
@@ -261,37 +266,12 @@
 
     // 点击按钮 搜索英雄
     $('.btn-search').click(() => {
-      const searchVal = $('[name=search]').val().trim()
-      if(!searchVal)return;
-      $.get({
-        url:"searchHero",
-        data:{
-          searchVal
-        },
-        success(res){
-          // console.log(res.length);
-          if(res.msg=='未登录'){
-            location = 'login.html'
-          } else {
-              if(res.length){
-                const html = template('tpl-tr', {list:res});
-                $('#my-table tbody').html(html);
-                totalPages = Math.ceil(res.length / pageNum);
-                pageIndex =1;
-                $('.page-num').children('a').text(`${pageIndex}/${totalPages}`)
-              } else {
-                $('#my-table tbody').html('<tr><td>查无此英雄!!!</td></tr>');
-                totalPages = 1;
-                pageIndex =1;
-                $('.page-num').children('a').text(`${pageIndex}/${totalPages}`)
-              }
-          }
-
-        }
-      })
+      queryName = $('[name=search]').val().trim();
+      if(!queryName)return;
+      console.log(queryName);
+      getHeros(pageIndex, pageNum,queryName);
       return false;
     })
-
 
   })
 </script>
