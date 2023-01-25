@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>王者荣耀--编辑</title>
+
+    <!-- Bootstrap -->
+    <link href="./lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!--
+      HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries
+    -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+      .logout {
+        font-weight: 900;
+        font-size: 20px;
+        color: #ff0000;
+        text-decoration: none;
+      }
+
+      .logout:hover {
+        text-decoration: none;
+        color: yellowgreen;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <nav class="navbar navbar-default">
+            <div class="container-fluid">
+              <!-- Brand and toggle get grouped for better mobile display -->
+              <div class="navbar-header">
+                <button
+                  type="button"
+                  class="navbar-toggle collapsed"
+                  data-toggle="collapse"
+                  data-target="#bs-example-navbar-collapse-1"
+                  aria-expanded="false"
+                >
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span> <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">欢迎进入后台管理</a>
+              </div>
+
+              <!--
+                Collect the nav links, forms, and other content for toggling
+              -->
+              <div
+                class="collapse navbar-collapse"
+                id="bs-example-navbar-collapse-1"
+              >
+                <p class="navbar-text navbar-right " style="font-weight: 700">
+                  欢迎 【蔡徐坤】登录
+                  <a href="" class="logout">退出</a>
+                </p>
+              </div>
+              <!-- /.navbar-collapse -->
+            </div>
+            <!-- /.container-fluid -->
+          </nav>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <ol class="breadcrumb">
+                <li><a href="./index.html">首页</a></li>
+                <li class="active">英雄编辑</li>
+              </ol>
+            </div>
+            <div class="panel-body">
+              <form action="#" method="post" class="form-horizontal">
+                <div class="form-group">
+                  <label for="heroName" class="col-sm-2 control-label"
+                    >姓名</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      required
+                      type="text"
+                      class="form-control"
+                      id="heroName"
+                      name="heroName"
+                      placeholder="请输入姓名"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="skill" class="col-sm-2 control-label">技能</label>
+                  <div class="col-sm-10">
+                    <input
+                      required
+                      type="text"
+                      class="form-control"
+                      id="skill"
+                      name="skill"
+                      placeholder="请输入技能"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="icon" class="col-sm-2 control-label">头像</label>
+                  <div class="col-sm-10">
+                    <input
+                      required
+                      type="file"
+                      class="form-control"
+                      id="icon"
+                      name="icon"
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default btn-save">保存</button>
+                    <button type="reset" class="btn btn-cancel ">取消</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="/lib/bootstrap/js/jquery-1.12.4.js"></script>
+<!--
+  Include all compiled plugins (below), or include individual files as needed
+-->
+<script src="/lib/bootstrap/js/bootstrap.min.js"></script>
+<script>
+  $(()=>{
+
+    const heroId = location.href.split('=')[1];
+
+    // 获取查询英雄
+    const heroDesc = (heroId)=>{
+      $.ajax({
+        url:"/getHero",
+        data:{
+          heroId
+        },
+        success(res){
+          console.log(res);
+          if(res.msg=='未登录'){
+            location = 'login.html'
+          } else {
+            $('#heroName').val(res.heroName);
+            $('#skill').val(res.skillArr[0].skillName);
+            // $('#icon').val(res.heroName);
+          }
+        }
+      })
+    }
+    heroDesc(heroId);
+
+    // 点击保存 编辑
+    $('.btn-save').click(()=>{
+      const heroName = $('#heroName').val().trim();
+      const skill = $('#skill').val().trim();
+      const iconFile = $('#icon').prop('files')
+      if(!heroName || !skill || !iconFile[0]){
+        // alert('资料不全!!!请检查!!');
+        return;
+      }
+      let formData = new FormData()
+      formData.append('heroId',heroId);
+      formData.append('heroName',heroName);
+      formData.append('heroSkill',skill);
+      formData.append('avatar',iconFile[0]);
+      
+      $.post({
+        url:"editHero",
+        data:formData,
+        processData: false,   // 是否序列化数据,发送文件不能序列化!! false时不要转化为字符串
+        contentType: false,  //.....告诉jquery不要设置 urlencode请求头
+        success(res){
+          console.log(res);
+          if(res.status=='success'){
+            alert('英雄编辑成功!');
+            location = 'index.html'
+          } else {
+            alert('英雄编辑失败!');
+          }
+        }
+      })
+      return false;
+    })
+
+
+  })
+</script>
+<script src="./common.js"></script>

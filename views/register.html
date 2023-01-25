@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>王者荣耀--注册</title>
+
+    <!-- Bootstrap -->
+    <link href="./lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <style>
+      .login-panel {
+        position: relative;
+        margin-top: 200px;
+      }
+
+      .vCode {
+        height: 36px;
+      }
+      .alert{
+      position: absolute;
+      top: -52px;
+      left: 0;
+      height: 52px;
+      width: 100%;
+    }
+    .alert p {
+      display: none;
+      font-weight: bold;
+      width: 100%;
+      text-align: center;
+    }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+          <div class="panel panel-primary login-panel">
+            <div class="alert">
+              <p class=""></p>
+            </div>
+            <div class="panel-heading">
+              <h3 class="panel-title">英雄管理系统注册</h3>
+            </div>
+            <div class="panel-body">
+              <form class="form-horizontal" method="post" action="#" autocomplete="off">
+                <div class="form-group">
+                  <label for="userName" class="col-sm-2 control-label"
+                    >用户名</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="text"
+                      name="userName"
+                      class="form-control"
+                      id="userName"
+                      placeholder="请输入用户名"
+                      required
+                    />
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="userPass" class="col-sm-2 control-label"
+                    >密码</label
+                  >
+                  <div class="col-sm-10">
+                    <input
+                      type="password"
+                      name="userPass"
+                      class="form-control"
+                      id="userPass"
+                      placeholder="请输入密码"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="col-sm-offset-2 col-sm-4">
+                    <button type="submit" class="btn btn-success register">
+                      提交
+                    </button>
+                    <a href="./login.html" class="btn btn-danger">返回</a>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="./lib/bootstrap/js/jquery-1.12.4.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="./lib/bootstrap/js/bootstrap.min.js"></script>
+<script>
+  $(()=>{
+
+    // 正则匹配url参数
+      const getUrlParams = name => {
+      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
+      var r = window.location.search.substr(1).match(reg);
+      if (r != null) return unescape(r[2]);
+      return null;
+    }
+    // 点击提交--注册信息
+    $('.register').click(()=>{
+      console.log(23423);
+      const userNamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
+      const userName = $('#userName').val().trim();
+      const userPass = $('#userPass').val().trim();
+      if(!userName || !userPass ){
+        return;
+      }
+      if(!userNamePattern.test(userName) || !userNamePattern.test(userPass)){
+        // alert('用户名或者密码格式错误!!');
+        $('.alert p').addClass('bg-danger').text('用户名或者密码格式错误!!').fadeIn(2000).fadeOut(2000);
+        
+      } else {
+        $.post({
+          url:"register",
+          data: $('.form-horizontal').serialize(),
+          success(res){
+            console.log(res);
+            if(res.status=='success'){
+              $('.alert p').addClass('bg-success').text(res.msg).fadeIn(2000).fadeOut();
+              const returnUrl = getUrlParams('returnUrl') || 'index.html';
+              $('.form-horizontal input').text('');
+              setTimeout(() => {
+                location = returnUrl;
+              }, 2000);
+            } else {
+              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(2000).fadeOut(2000);
+            }
+          }
+        })       
+      }
+      return false;
+    })
+  })
+</script>
