@@ -137,7 +137,6 @@
 
     // 点击-登录
     $('.login').click(()=>{
-      
       const userNamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
       const userName = $('#userName').val().trim();
       const userPass = $('#userPass').val().trim();
@@ -155,14 +154,14 @@
           data:$('.form-horizontal').serialize(),
           success(res){
             if(res.status=='success'){
-              $('.alert p').addClass('bg-success').text(res.msg).fadeIn(2000).fadeOut();
+              $('.alert p').addClass('bg-success').text(res.msg).fadeIn(1000).fadeOut();
               const returnUrl = getUrlParams('returnUrl') || 'index.html';
               $('.form-horizontal input').text('')
               setTimeout(() => {
                 location = returnUrl;
-              }, 2000);
+              }, 1500);
             } else {
-              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(2000).fadeOut(2000);
+              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(2000).fadeOut();
             }
           }
         })       
