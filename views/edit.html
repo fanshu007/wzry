@@ -34,10 +34,10 @@
       }
       .alert{
       position: absolute;
-      top: -52px;
-      left: 0;
+      top: 0;
+      right: 0;
       height: 52px;
-      width: 100%;
+      width: 90%;
     }
     .alert p {
       display: none;
@@ -63,7 +63,7 @@
                   data-target="#bs-example-navbar-collapse-1"
                   aria-expanded="false"
                 >
-                  <span class="sr-only">Toggle navigation</span>
+                  <span class="sr-only">切换 导航</span>
                   <span class="icon-bar"></span> <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                 </button>
@@ -78,7 +78,7 @@
                 id="bs-example-navbar-collapse-1"
               >
                 <p class="navbar-text navbar-right " style="font-weight: 700">
-                  欢迎 【蔡徐坤】登录
+                  欢迎 【】登录
                   <a href="" class="logout">退出</a>
                 </p>
               </div>
@@ -175,9 +175,9 @@
           heroId
         },
         success(res){
-          console.log(res);
+          // console.log(res);
           if(res.msg=='未登录'){
-            location = 'login.html'
+            location = 'login.html?returnUrl='+location.href.split(location.port+'/')[1];
           } else {
             $('#heroName').val(res.heroName);
             $('#skill').val(res.skillArr[0].skillName);

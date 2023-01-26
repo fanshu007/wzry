@@ -104,19 +104,12 @@
 <script src="./lib/bootstrap/js/jquery-1.12.4.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="./lib/md5/md5.min.js"></script>
 <script>
   $(()=>{
 
-    // 正则匹配url参数
-      const getUrlParams = name => {
-      var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i"); //定义正则表达式 
-      var r = window.location.search.substr(1).match(reg);
-      if (r != null) return unescape(r[2]);
-      return null;
-    }
     // 点击提交--注册信息
     $('.register').click(()=>{
-      console.log(23423);
       const userNamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
       const userName = $('#userName').val().trim();
       const userPass = $('#userPass').val().trim();
@@ -126,19 +119,18 @@
       if(!userNamePattern.test(userName) || !userNamePattern.test(userPass)){
         // alert('用户名或者密码格式错误!!');
         $('.alert p').addClass('bg-danger').text('用户名或者密码格式错误!!').fadeIn(2000).fadeOut(2000);
-        
       } else {
+        let md5String = md5(userPass,'add Sweetness');
+        $('#userPass').val(md5String);
         $.post({
           url:"register",
           data: $('.form-horizontal').serialize(),
           success(res){
-            console.log(res);
             if(res.status=='success'){
               $('.alert p').addClass('bg-success').text(res.msg).fadeIn(2000).fadeOut();
-              const returnUrl = getUrlParams('returnUrl') || 'index.html';
               $('.form-horizontal input').text('');
               setTimeout(() => {
-                location = returnUrl;
+                location.href = 'login.html';
               }, 2000);
             } else {
               $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(2000).fadeOut(2000);

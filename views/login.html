@@ -114,6 +114,7 @@
 <script src="./lib/bootstrap/js/jquery-1.12.4.js"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="./lib/bootstrap/js/bootstrap.min.js"></script>
+<script src="./lib/md5/md5.min.js"></script>
 <script>
   $(()=>{
 
@@ -135,7 +136,7 @@
       }, 10000);
     })
 
-    // 点击-登录
+    // 点击/回车-登录--也可以用form的submit事件
     $('.login').click(()=>{
       const userNamePattern = /^[a-zA-Z0-9_-]{4,16}$/;
       const userName = $('#userName').val().trim();
@@ -147,8 +148,9 @@
       if(!userNamePattern.test(userName) || !userNamePattern.test(userPass)){
         // alert('用户名或者密码格式错误!!');
         $('.alert p').addClass('bg-danger').text('用户名或者密码格式错误!!').fadeIn(2000).fadeOut(2000);
-        
       } else {
+        let md5String = md5(userPass,'add Sweetness');
+        $('#userPass').val(md5String);
         $.post({
           url:"login",
           data:$('.form-horizontal').serialize(),
@@ -168,7 +170,6 @@
       }
       return false;
     })
-
 
   })
 </script>

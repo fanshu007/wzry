@@ -50,7 +50,7 @@ router.get("/logout", (req, res) => {
   // req.session.cookie.maxAge = 0;
   req.session.destroy(function (err) {
     console.log(err);
-})
+  });
   res.send({
     status: "success",
     msg: "退出成功",
@@ -68,11 +68,8 @@ router.post("/login", (req, res) => {
     });
     return;
   }
-  mongodbHelper.find("userList", {}, (data) => {
-    const accountPass = data.some(
-      (val) => userName == val.userName && userPass == val.userPass
-    );
-    if (accountPass) {
+  mongodbHelper.find("userList", { userName, userPass }, (data) => {
+    if (data.length) {
       req.session.userinfo = userName;
       res.send({
         msg: "登录成功",
@@ -84,6 +81,9 @@ router.post("/login", (req, res) => {
         status: "fail",
       });
     }
+    // const accountPass = data.some(
+    //   (val) => userName == val.userName && userPass == val.userPass
+    // );
   });
 });
 // (1) 账号 注册
@@ -92,9 +92,9 @@ router.post("/register", (req, res) => {
   const userName = req.body.userName;
   const userPass = req.body.userPass;
   let accountExist = false;
-  mongodbHelper.find("userList", {}, (data) => {
-    accountExist = data.some((val) => userName == val.userName);
-    if (accountExist) {
+  mongodbHelper.find("userList", { userName }, (data) => {
+    if (data.length) {
+      accountExist = true;
       res.send({
         msg: "注册失败,账号已存在!",
         status: "fail",
@@ -104,7 +104,6 @@ router.post("/register", (req, res) => {
   setTimeout(() => {
     if (!accountExist) {
       mongodbHelper.insert("userList", { userName, userPass }, (data1) => {
-        console.log(data1);
         if (data1.acknowledged == true) {
           res.send({
             msg: "注册成功!",
@@ -133,7 +132,7 @@ router.get("/getUserinfo", (req, res) => {
 
 // (2) 获取英雄列表
 router.get("/getHeroList", (req, res) => {
-  console.log(req.session.userinfo);
+  console.log(req.session);
   // 是否已登录
   if (!req.session.userinfo) {
     res.send({
@@ -149,12 +148,14 @@ router.get("/getHeroList", (req, res) => {
   const endIndex = startIndex + Number(pageNum);
   mongodbHelper.find("heroList", {}, (data) => {
     if (data.length) {
-      const queryHeroArr = data.filter(val=>{
-        if(val.heroName.indexOf(queryName) != -1 || val.skillArr[0].skillName.indexOf(queryName)!=-1){
+      const queryHeroArr = data.filter((val) => {
+        if (
+          val.heroName.indexOf(queryName) != -1 ||
+          val.skillArr[0].skillName.indexOf(queryName) != -1
+        ) {
           return true;
         }
-      }
-      );
+      });
       let selectedHero = [];
       queryHeroArr.forEach((ele, index) => {
         if (index >= startIndex && index < endIndex) {
