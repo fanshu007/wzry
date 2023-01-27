@@ -1,5 +1,5 @@
 // 导入模块
-var express = require("express");
+const express = require("express");
 var router = express.Router();
 
 // 导入验证码模块
@@ -8,6 +8,7 @@ const svgCaptcha = require("svg-captcha");
 const fs = require("fs");
 // session模块
 const session = require("express-session");
+// const session = require("cookie-session");
 const bodyParser = require("body-parser");
 const mongodbHelper = require("./views/lib/mongodbHelper");
 
@@ -26,31 +27,58 @@ router.use(
     },
   })
 );
+// app.set('trust proxy', 1) // trust first proxy
+// app.use(
+//   session({
+//     name: "sesion",
+//     keys: ["dragon",'ball'],
+//     // Cookie Options
+//     maxAge: 600000, // 10min后强制退出
+//   })
+// );
 // multer中间件
 const multer = require("multer");
 const upload = multer({ dest: "views/uploads/" });
 
+// 注册自定义中间件--判断是否有登录
+router.use((req, res, next) => {
+  // console.log(req.url);
+  if (req.url.indexOf("Hero") != -1) {
+    if (!req.session.userinfo) {
+      res.send({
+        status: "fail",
+        msg: "未登录",
+      });
+    } else {
+      next();
+    }
+  } else {
+    next();
+  }
+});
+
 // ----路由导航----
 //获取验证码 将验证码返回
-let captchaText = "";
 router.get("/captcha", (req, res) => {
   //创建验证码
   //默认四位数验证码
   const captcha = svgCaptcha.create({
     noise: 3, //噪声线/干扰线
-  }); //设置响应类型
+  });
+  req.session.captcha = captcha.text;
+  //设置响应类型
   res.type("svg"); //响应数据
   res.status(200).send(captcha.data);
-  captchaText = captcha.text;
-  console.log(captchaText);
+  console.log(captcha.text);
 });
 
 // (1) 账号 登出
 router.get("/logout", (req, res) => {
-  // req.session.cookie.maxAge = 0;
-  req.session.destroy(function (err) {
-    console.log(err);
-  });
+  req.session.cookie.maxAge = 0;
+  // req.session.destroy(function (err) {
+  //   console.log(err);
+  // });
+  // req.session = null;
   res.send({
     status: "success",
     msg: "退出成功",
@@ -61,7 +89,7 @@ router.post("/login", (req, res) => {
   const userName = req.body.userName;
   const userPass = req.body.userPass;
   const vCode = req.body.vCode;
-  if (vCode !== captchaText) {
+  if (vCode !== req.session.captcha) {
     res.send({
       msg: "验证码错误!!",
       status: "fail",
@@ -88,7 +116,6 @@ router.post("/login", (req, res) => {
 });
 // (1) 账号 注册
 router.post("/register", (req, res) => {
-  console.log("register");
   const userName = req.body.userName;
   const userPass = req.body.userPass;
   let accountExist = false;
@@ -122,25 +149,17 @@ router.get("/getUserinfo", (req, res) => {
       status: "fail",
       msg: "未登录",
     });
-    return;
+  } else {
+    res.send({
+      status: "success",
+      userName: req.session.userinfo,
+    });
   }
-  res.send({
-    status: "success",
-    userName: req.session.userinfo,
-  });
 });
 
 // (2) 获取英雄列表
 router.get("/getHeroList", (req, res) => {
-  console.log(req.session);
-  // 是否已登录
-  if (!req.session.userinfo) {
-    res.send({
-      status: "fail",
-      msg: "未登录",
-    });
-    return;
-  }
+  // console.log(req.session);
   const pageIndex = req.query.pageIndex;
   const pageNum = req.query.pageNum;
   const queryName = req.query.queryName;
@@ -157,7 +176,8 @@ router.get("/getHeroList", (req, res) => {
         }
       });
       let selectedHero = [];
-      queryHeroArr.forEach((ele, index) => {
+      // 倒序排列
+      queryHeroArr.reverse().forEach((ele, index) => {
         if (index >= startIndex && index < endIndex) {
           selectedHero.push({
             heroName: ele.heroName,
@@ -181,14 +201,6 @@ router.get("/getHeroList", (req, res) => {
 });
 // (3) 获取某个英雄之详情
 router.get("/getHero", (req, res) => {
-  // 是否已登录
-  if (!req.session.userinfo) {
-    res.send({
-      status: "fail",
-      msg: "未登录",
-    });
-    return;
-  }
   const heroId = req.query.heroId;
   mongodbHelper.find(
     "heroList",
@@ -201,14 +213,6 @@ router.get("/getHero", (req, res) => {
 
 // (4) 接收数据 添加英雄
 router.post("/addHero", upload.single("heroIcon"), function (req, res, next) {
-  // 是否已登录
-  if (!req.session.userinfo) {
-    res.send({
-      status: "fail",
-      msg: "未登录",
-    });
-    return;
-  }
   // req.file 是 `heroIcon` 文件的信息
   // req.body 将具有文本域数据，如果存在的话
   fs.rename(
@@ -247,14 +251,6 @@ router.post("/addHero", upload.single("heroIcon"), function (req, res, next) {
 
 // (4) 编辑某个英雄
 router.post("/editHero", upload.single("heroIcon"), (req, res, next) => {
-  // 是否已登录
-  if (!req.session.userinfo) {
-    res.send({
-      status: "fail",
-      msg: "未登录",
-    });
-    return;
-  }
   fs.rename(
     req.file.path,
     `views/uploads/${req.file.originalname}`,
@@ -292,14 +288,6 @@ router.post("/editHero", upload.single("heroIcon"), (req, res, next) => {
 
 // (5) 删除某个英雄
 router.post("/deleteHero", (req, res) => {
-  // 是否已登录
-  if (!req.session.userinfo) {
-    res.send({
-      status: "fail",
-      msg: "未登录",
-    });
-    return;
-  }
   const heroId = req.body.heroId;
   mongodbHelper.delete(
     "heroList",

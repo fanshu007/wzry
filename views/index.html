@@ -43,6 +43,9 @@
       width: 50px;
       height: 50px;
     }
+    #bs-example-navbar-collapse-1 strong {
+      color: deeppink;
+    }
   </style>
 </head>
 
@@ -67,7 +70,7 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
               <p class="navbar-text navbar-right " style="font-weight: 700">
-                欢迎 【】登录
+                欢迎 【<strong></strong>】登录
                 <a href="#" class="logout">退出</a>
               </p>
             </div>
@@ -91,7 +94,7 @@
             <!-- action 不写 就是当前页面 method 不写 就是 get -->
             <div class="row">
               <div class="col-md-9">
-                <form class="form-inline" autocomplete="off">
+                <form class="form-inline" autocomplete="off" id="searchForm">
                   <div class="form-group">
                     <label class="sr-only" for="exampleInputAmount">Amount (in dollars)</label>
                     <div class="input-group">
@@ -236,13 +239,16 @@
     })
 
     // 点击按钮/回车 搜索英雄
-    $('.btn-search').click(() => {
+    $('#searchForm').submit(function(e){
+      e.preventDefault();
       queryName = $('[name=search]').val().trim();
       if(!queryName)return;
       console.log(queryName);
       getHeros(pageIndex, pageNum,queryName);
-      return false;
+      // return false;      
     })
+    // $('.btn-search').click(() => {
+    // })
 
   // 点击跳转到编辑页面
   $('tbody').on('click','.btn-edit',function(){

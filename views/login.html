@@ -30,16 +30,15 @@
     .col-sm-4 {
       position: relative;
     }
-    .btn-disable {
+    .not-allow {
       display: none;
       position: absolute;
       left: 15px;
       top: 0;
       width: 108px;
       height: 36px;
-      /* font-size: 20px;
-      color: red;
-      font-weight: bolder; */
+      opacity: .2;
+      cursor: not-allowed;
     }
     .alert{
       position: absolute;
@@ -90,7 +89,7 @@
                   <input type="text" required name="vCode" class="form-control" id="vCode" placeholder="请输入验证码">
                 </div>
                 <div class="col-sm-4">
-                  <button type="button" class="btn btn-default btn-disable" disabled="disabled"></button>
+                  <div class="not-allow"></div>
                   <img class='vCode' src="./lib/img/code.png" alt="">
                 </div>
               </div>
@@ -129,10 +128,11 @@
     // 初始化验证码图片
     $('.vCode').attr('src','/captcha');
     $('.vCode').click(function(){
-      $(this).attr("src",`/captcha/?${Math.random()}`);
-      $('.btn-disable').show()
+      $(this).attr("src",`/captcha/?${new Date().getTime()}`);
+      // $(this).attr("src",`/captcha/?${Math.random()}`);
+      $('.not-allow').show()
       setTimeout(() => {
-        $('.btn-disable').hide()
+        $('.not-allow').hide()
       }, 10000);
     })
 
@@ -147,13 +147,16 @@
       }
       if(!userNamePattern.test(userName) || !userNamePattern.test(userPass)){
         // alert('用户名或者密码格式错误!!');
-        $('.alert p').addClass('bg-danger').text('用户名或者密码格式错误!!').fadeIn(2000).fadeOut(2000);
+        $('.alert p').addClass('bg-danger').text('用户名或者密码格式错误!!').fadeIn(1000).fadeOut(1000);
       } else {
         let md5String = md5(userPass,'add Sweetness');
-        $('#userPass').val(md5String);
         $.post({
           url:"login",
-          data:$('.form-horizontal').serialize(),
+          data:{
+            userName,
+            userPass:md5String,
+            vCode
+          },
           success(res){
             if(res.status=='success'){
               $('.alert p').addClass('bg-success').text(res.msg).fadeIn(1000).fadeOut();
@@ -163,7 +166,7 @@
                 location = returnUrl;
               }, 1500);
             } else {
-              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(2000).fadeOut();
+              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(1000).fadeOut();
             }
           }
         })       

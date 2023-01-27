@@ -118,22 +118,25 @@
       }
       if(!userNamePattern.test(userName) || !userNamePattern.test(userPass)){
         // alert('用户名或者密码格式错误!!');
-        $('.alert p').addClass('bg-danger').text('用户名或者密码格式错误!!').fadeIn(2000).fadeOut(2000);
+        $('.alert p').addClass('bg-danger').text('用户名或者密码格式错误!!').fadeIn(1000).fadeOut(1000);
       } else {
+        // 额外加一个字段 增加解密难度
         let md5String = md5(userPass,'add Sweetness');
-        $('#userPass').val(md5String);
         $.post({
           url:"register",
-          data: $('.form-horizontal').serialize(),
+          data: {
+            userName,
+            userPass:md5String
+          },
           success(res){
             if(res.status=='success'){
-              $('.alert p').addClass('bg-success').text(res.msg).fadeIn(2000).fadeOut();
+              $('.alert p').addClass('bg-success').text(res.msg).fadeIn(1000).fadeOut();
               $('.form-horizontal input').text('');
               setTimeout(() => {
                 location.href = 'login.html';
-              }, 2000);
+              }, 1500);
             } else {
-              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(2000).fadeOut(2000);
+              $('.alert p').addClass('bg-danger').text(res.msg).fadeIn(1000).fadeOut(1000);
             }
           }
         })       

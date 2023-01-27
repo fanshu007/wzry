@@ -37,13 +37,26 @@
       top: 0;
       right: 0;
       height: 52px;
-      width: 90%;
+      width: 80%;
     }
     .alert p {
       display: none;
       font-weight: bold;
       width: 100%;
       text-align: center;
+    }
+    .preview {
+      width: 80px;
+      height: 80px;
+      border: 1px solid #ccc;
+    }
+    .preview img {
+      display: none;
+      width: 80px;
+      height: 80px;
+    }
+    #bs-example-navbar-collapse-1 strong {
+      color: deeppink;
     }
     </style>
   </head>
@@ -78,7 +91,7 @@
                 id="bs-example-navbar-collapse-1"
               >
                 <p class="navbar-text navbar-right " style="font-weight: 700">
-                  欢迎 【】登录
+                  欢迎 【<strong></strong>】登录
                   <a href="" class="logout">退出</a>
                 </p>
               </div>
@@ -133,6 +146,9 @@
                 <div class="form-group">
                   <label for="icon" class="col-sm-2 control-label">头像</label>
                   <div class="col-sm-10">
+                    <div class="preview">
+                      <img src="" alt="" class="">
+                    </div>
                     <input
                       required
                       type="file"
@@ -175,18 +191,28 @@
           heroId
         },
         success(res){
-          // console.log(res);
           if(res.msg=='未登录'){
             location = 'login.html?returnUrl='+location.href.split(location.port+'/')[1];
           } else {
             $('#heroName').val(res.heroName);
             $('#skill').val(res.skillArr[0].skillName);
-            // $('#icon').val(res.heroName);
+            $('.preview img').attr('src',res.heroIcon).show()
           }
         }
       })
     }
     heroDesc(heroId);
+
+    // 选择了图片 修改预览
+    $('#icon').change(function(){
+      if($(this).val()){
+        const url = window.URL.createObjectURL($(this).prop('files')[0]);
+        $('.preview img').attr('src',url);
+      } else {
+        $('.preview img').hide();
+      }
+    })
+
     // 点击保存 编辑
     $('.btn-save').click(()=>{
       // 也可以用一个type=hidden传递heroId,但是不严谨
