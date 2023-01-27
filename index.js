@@ -13,3 +13,5 @@ app.use(router)
 app.listen(6699, () => {
   console.log("服务器启动了");
 });
+
+module.exports = app;
